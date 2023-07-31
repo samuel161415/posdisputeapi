@@ -3,7 +3,7 @@ const mongoose=require('mongoose')
 
 const Keys=new mongoose.Schema({
     key:{
-        type:String,
+        type:Number,
         required:true
     },
     branch:{
@@ -16,6 +16,22 @@ const Keys=new mongoose.Schema({
     },
     amount:{
         type:Number,
+        required:true
+    },
+    account:{
+        type:String,
+        required:true
+    },
+    pan:{
+        type:Number,
+        required:true
+    },
+    trxn_date:{
+        type:Date,
+        required:true
+    },
+    terminal:{
+        type:String,
         required:true
     }
 })

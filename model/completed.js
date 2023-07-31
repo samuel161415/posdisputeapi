@@ -5,7 +5,11 @@ const Completed=new mongoose.Schema({
     key:{
         type:String,
         required:true
-    }
+    },
+    date:{
+        type:Date,
+        reqired:true
+    },
    
 })
 
