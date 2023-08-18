@@ -18,6 +18,29 @@ router.get('/requested/get',async(req,res)=>{
 
 })
 
+
+
+router.get('/requested/get/:branch',async(req,res)=>{
+    try{
+        // filtering key collections using branch
+        // console.log('yes i am here',req.params.branch);
+           const filteredBranch = await Keys.find({branch: req.params.branch}).sort({_id:-1})
+          
+           let keyValues = []
+           for(var i =0; i< filteredBranch.length; i++){
+              keyValues.push(filteredBranch[i].key)
+           }
+          //  filtering completed collections using keys of the branch
+           const result = await Requested.find({ key: { $in: keyValues } })
+    
+          return res.json(result)
+    
+      }
+      catch(err){
+          console.log(err);
+      }
+})
+
 // getting all keys
 router.get('/getAll',async(req,res)=>{
     try{
@@ -65,53 +88,11 @@ router.post('/requested/add',async(req,res)=>{
     // }
 })
 
+
+
 // retrievng requests based on branch
-router.get('/requested/branch/:branch',async(req,res)=>{
-    
-  try{
-    // const result=await Requested.aggregate([
-    //     {
-    //       $lookup: {
-    //         from: "Keys",
-    //         localField: 'key',
-    //         foreignField: "key",
-    //         as: "keyInfo"
-    //       }
-    //     },
-    //     {
-    //       $match: {
-    //         "keyInfo.branch":"shiromeda" 
-    //       }
-    //     }
-    //   ])
-    //   console.log('result',result);
 
-      const allkeys=await Keys.find({branch:`${req.params.branch}`})
-      requested_keys=[]
-      for(const key of allkeys){
-          requested_keys.push(key['key']) 
-      }
-      const f_result=await Requested.find({key:{$in:requested_keys}})
 
-      return res.json(f_result)
-
-      }
-      catch(err){
-         return   res.status(500).json(err)
-      }
-
-})
-router.get('/all/branch/:branch',async(req,res)=>{
-  try{
-         const branch= await Keys.find({branch:req.params.branch})
-         return  res.status(200).json(branch)
-
-      }
-      catch(err){
-         return   res.status(500).json(err)
-      }
-
-})
 
 router.delete('/requested/delete',async(req,res)=>{
    const deletedRes=Requested.deleteOne({key:req.body.key})

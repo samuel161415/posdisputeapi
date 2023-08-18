@@ -2,13 +2,14 @@ const router = require('express').Router()
 const Requested = require('../model/requested')
 const Invalid = require('../model/invalid')
 const Pending = require('../model/pending')
+const Keys = require('../model/invalid')
 
 router.post('/invalid/add/:where',async(req,res)=>{
 
     try{
         //  deleting on the pending status
         let c_data={}
-        console.log('on invalid');
+        // console.log('on invalid');
         
         if(req.params.where==='pending'){
             c_data = await Pending.findOne({key:req.body.key})
@@ -17,10 +18,10 @@ router.post('/invalid/add/:where',async(req,res)=>{
         else if(req.params.where==='requested'){
              c_data = await Requested.findOne({key:req.body.key})
             const deletedPending = await Requested.deleteOne({key:req.body.key})
-            if(deletedPending){
-                console.log("deleted successfully");
-            }
-            console.log('declined c_data',c_data);
+            // if(deletedPending){
+            //     console.log("deleted successfully");
+            // }
+            // console.log('declined c_data',c_data);
         }
         else{
             return
@@ -52,8 +53,29 @@ router.get('/invalid/get',async(req,res)=>{
     }
 })
 
+router.get('/invalid/get/:branch',async(req,res)=>{
+
+    try{
+        // filtering key collections using branch
+           const filteredBranch = await Keys.find({branch: req.params.branch}).sort({_id:-1})
+          
+           let keyValues = []
+           for(var i =0; i< filteredBranch.length; i++){
+              keyValues.push(filteredBranch[i].key)
+           }
+          //  filtering completed collections using keys of the branch
+           const result = await Invalid.find({ key: { $in: keyValues } })
+    
+          return res.json(result)
+    
+      }
+      catch(err){
+          console.log(err);
+      }
+})
+
 router.get('/invalid/single/:k',async(req,res)=>{
-    console.log('on get',req.params.k);
+    // console.log('on get',req.params.k);
      try{
          const result = await Invalid.findOne({key:req.params.k})
          return res.json(result)

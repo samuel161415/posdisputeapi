@@ -4,12 +4,11 @@ const CryptoJs = require('crypto-js')
 
 router.post('/register', async(req,res)=>{
     try{
-    //   check if user already registered
    
     const user_found = await User.findOne({username:req.body.username})
     
     if(user_found){
-        console.log('user found');
+        // console.log('user found');
         return res.status(409).json({ message: 'User already exists' });
         
     }
@@ -31,12 +30,12 @@ router.post('/register', async(req,res)=>{
 
 router.post('/login', async(req,res)=>{
     try{
-        console.log('login entered',req.body);
+        // console.log('login entered',req.body);
     
         const user=await User.findOne({username:req.body.username});
      
 
-        if(!user)  return res.status(401).json("user not found");
+        if(!user)  return res.status(404).json("user not found");
     
         const tempPass = user.password;
     
@@ -52,5 +51,33 @@ router.post('/login', async(req,res)=>{
       }
 
 })
+
+
+router.put('/update',async(req,res)=>{
+//   console.log('user data',req.body);
+    
+    try{
+      if(req.body.password){
+        password=CryptoJs.AES.encrypt(req.body.password, process.env.PASS_SEC).toString()
+        req.body.password=password
+     
+      } 
+        
+        const update=await User.updateOne(
+               { username: req.body.username },
+               { $set: req.body }, // use this format for update or updateOne. 
+                                                                 //it changes the values in upadate and leaves the other fileds unchanged
+                 { upsert: true }  // used to insert if the object not found
+            )
+    
+            res.status(200).send('user is updated succesfully')
+       
+    }
+    catch(err){
+        res.status(500).json(err)
+    }
+    })
+
+module.exports=router
 
 module.exports = router

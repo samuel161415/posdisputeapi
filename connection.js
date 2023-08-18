@@ -10,7 +10,7 @@ const mongoose = require('mongoose')
         console.log('connected');
     } catch(error) {
          console.log(error)
-        process.exit()
+         process.exit()
     }
 }
 module.exports=connectDB
